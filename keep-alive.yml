@@ -1,0 +1,27 @@
+# Supabase keep-alive – megakadályozza, hogy az ingyenes projekt 7 nap tétlenség után szüneteljen.
+# HELYE A REPÓBAN:  .github/workflows/keep-alive.yml
+#
+# Hétfőn és csütörtökön fut (UTC szerint), plusz kézzel is indíthatod az Actions fülről.
+# A :17 perc szándékos: a pontos órákon nagy a torlódás a GitHubon, könnyebben csúszik/kimarad.
+
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "17 6 * * 1,4"    # hétfő és csütörtök 06:17 UTC
+  workflow_dispatch:           # kézi indítás (teszteléshez)
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST
+        run: |
+          curl -sS --fail -o /dev/null -w "HTTP %{http_code}\n" \
+            "https://biasesnicebznutbsdfr.supabase.co/rest/v1/polls?select=id&limit=1" \
+            -H "apikey: sb_publishable_M_61p2Z4hm58qqB3TM1M_Q_isIiqvnT"
+
+# Megjegyzés: a fenti kulcs a "publishable" (nyilvános) kulcs, ami a weboldaladban is szerepel,
+# ezért nyugodtan lehet a fájlban. Ha inkább GitHub Secretben tárolnád, hozz létre egy
+# SUPABASE_KEY nevű secretet, és cseréld a fenti sort erre:
+#   -H "apikey: ${{ secrets.SUPABASE_KEY }}"
